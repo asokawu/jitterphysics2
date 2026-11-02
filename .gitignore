@@ -20,3 +20,6 @@ publish/
 *.log
 *.tmp
 TestResults/
+
+# 引擎源码（由 tools/bootstrap.ps1 克隆并打补丁恢复，不入库）
+engine/
