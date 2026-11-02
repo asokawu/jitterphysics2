@@ -1,0 +1,38 @@
+<Project>
+
+  <!--
+    本仓库所有工程的公共构建设置，由各 .csproj 显式 <Import>（不要放回 Directory.Build.props，
+    否则会被 engine\jitterphysics2 下的上游工程一起继承）。
+
+    精度：Jitter2 的源码只有一份，单/双精度靠编译期符号 USE_DOUBLE_PRECISION 区分，
+    双精度下程序集名变成 Jitter2.Double。所以这里既定义符号，也用 AdditionalProperties
+    把同一个开关传给引擎的 ProjectReference。
+  -->
+
+  <PropertyGroup>
+    <JptRootDir>$(MSBuildThisFileDirectory)..\</JptRootDir>
+    <JptEngineProject>$(JptRootDir)engine\jitterphysics2\src\Jitter2\Jitter2.csproj</JptEngineProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+
+    <DoublePrecision>true</DoublePrecision>
+    <DefineConstants>$(DefineConstants);USE_DOUBLE_PRECISION</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" Link="Properties\GlobalUsings.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(JptEngineProject)" AdditionalProperties="DoublePrecision=true" />
+  </ItemGroup>
+
+</Project>

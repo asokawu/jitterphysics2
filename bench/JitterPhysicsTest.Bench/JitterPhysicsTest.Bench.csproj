@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\build\JitterPhysicsTest.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>JitterPhysicsTest.Bench</RootNamespace>
+    <!-- BenchmarkDotNet 需要固定 GC 与优化设置，否则不同次跑出来的数字不可比。 -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\JitterPhysicsTest.Scenes\JitterPhysicsTest.Scenes.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JitterPhysicsTest.Scenes/JitterPhysicsTest.Scenes.csproj" />
+    <Project Path="src/JitterPhysicsTest.Cli/JitterPhysicsTest.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JitterPhysicsTest.Tests/JitterPhysicsTest.Tests.csproj" />
+  </Folder>
+  <Folder Name="/bench/">
+    <Project Path="bench/JitterPhysicsTest.Bench/JitterPhysicsTest.Bench.csproj" />
+  </Folder>
+</Solution>

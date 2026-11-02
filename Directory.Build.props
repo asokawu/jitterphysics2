@@ -1,0 +1,13 @@
+<Project>
+
+  <!--
+    这里故意保持为空。
+
+    仓库的构建设置放在 build\JitterPhysicsTest.props，由各工程显式 <Import>，
+    而不是靠这里的 Directory.Build.props 自动继承——因为 engine\jitterphysics2 是上游源码克隆，
+    自动继承会把我们的设置（全局 using、警告即错误等）泄漏到上游工程里。
+
+    保留这个空文件是为了阻止 MSBuild 继续向上层目录寻找 Directory.Build.props。
+  -->
+
+</Project>

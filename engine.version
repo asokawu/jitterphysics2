@@ -1,0 +1,4 @@
+# Pinned upstream commit of notgiven688/jitterphysics2.
+# tools\bootstrap.ps1 checks out engine\jitterphysics2 at this commit, then applies
+# patches\*.patch, so "engine version + local changes" stays reproducible.
+1f2bdb40a5454a8a326ac5697f3d1922de7807b3

@@ -1,0 +1,164 @@
+diff --git a/src/JitterDemo/Demos/Demo20.cs b/src/JitterDemo/Demos/Demo20.cs
+index 0c08e8f9..75b2def3 100644
+--- a/src/JitterDemo/Demos/Demo20.cs
++++ b/src/JitterDemo/Demos/Demo20.cs
+@@ -132,7 +132,7 @@ public class Tester(Octree tree) : IDynamicTreeProxy, IRayCastable
+     public JVector Velocity => JVector.Zero;
+     public JBoundingBox WorldBoundingBox { get; } = tree.Dimensions;
+ 
+-    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out float lambda)
++    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out Real lambda)
+     {
+         return tree.Raycast(origin,direction, out normal, out lambda);
+     }
+diff --git a/src/JitterDemo/Demos/Demo21.cs b/src/JitterDemo/Demos/Demo21.cs
+index 15cf0830..4fdbeff2 100644
+--- a/src/JitterDemo/Demos/Demo21.cs
++++ b/src/JitterDemo/Demos/Demo21.cs
+@@ -173,7 +173,7 @@ public class VoxelWorld : IDynamicTreeProxy, IRayCastable
+     public int NodePtr { get; set; }
+     public int SetIndex { get; set; } = -1;
+ 
+-    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out float lambda)
++    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out Real lambda)
+     { normal = JVector.Zero; lambda = 0; return false; }
+ }
+ 
+diff --git a/src/JitterDemo/Demos/Demo25.cs b/src/JitterDemo/Demos/Demo25.cs
+index 488c1910..f7ac9b63 100644
+--- a/src/JitterDemo/Demos/Demo25.cs
++++ b/src/JitterDemo/Demos/Demo25.cs
+@@ -46,15 +46,15 @@ public class HeightmapTester(JBoundingBox box) : IDynamicTreeProxy, IRayCastable
+     public JVector Velocity => JVector.Zero;
+     public JBoundingBox WorldBoundingBox { get; } = box;
+ 
+-    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out float lambda)
++    public bool RayCast(in JVector origin, in JVector direction, out JVector normal, out Real lambda)
+     {
+-        const float maxDistance = 100.0f;
++        const Real maxDistance = 100;
+ 
+-        float dirX = direction.X;
+-        float dirZ = direction.Z;
++        Real dirX = direction.X;
++        Real dirZ = direction.Z;
+ 
+-        float len2 = dirX * dirX + dirZ * dirZ;
+-        float ilen = 1.0f / MathF.Sqrt(len2);
++        Real len2 = dirX * dirX + dirZ * dirZ;
++        Real ilen = (Real)1 / MathR.Sqrt(len2);
+ 
+         dirX *= ilen;
+         dirZ *= ilen;
+@@ -65,16 +65,16 @@ public class HeightmapTester(JBoundingBox box) : IDynamicTreeProxy, IRayCastable
+         int stepX = dirX > 0 ? 1 : -1;
+         int stepZ = dirZ > 0 ? 1 : -1;
+ 
+-        float nextX = dirX > 0 ? (x + 1) - origin.X : origin.X - x;
+-        float nextZ = dirZ > 0 ? (z + 1) - origin.Z : origin.Z - z;
++        Real nextX = dirX > 0 ? (x + 1) - origin.X : origin.X - x;
++        Real nextZ = dirZ > 0 ? (z + 1) - origin.Z : origin.Z - z;
+ 
+-        float tMaxX = dirX != 0 ? nextX / Math.Abs(dirX) : float.PositiveInfinity;
+-        float tMaxZ = dirZ != 0 ? nextZ / Math.Abs(dirZ) : float.PositiveInfinity;
++        Real tMaxX = dirX != 0 ? nextX / Math.Abs(dirX) : Real.PositiveInfinity;
++        Real tMaxZ = dirZ != 0 ? nextZ / Math.Abs(dirZ) : Real.PositiveInfinity;
+ 
+-        float tDeltaX = direction.X != 0 ? 1f / Math.Abs(dirX) : float.PositiveInfinity;
+-        float tDeltaZ = direction.Z != 0 ? 1f / Math.Abs(dirZ) : float.PositiveInfinity;
++        Real tDeltaX = direction.X != 0 ? (Real)1 / Math.Abs(dirX) : Real.PositiveInfinity;
++        Real tDeltaZ = direction.Z != 0 ? (Real)1 / Math.Abs(dirZ) : Real.PositiveInfinity;
+ 
+-        float t = 0f;
++        Real t = 0;
+ 
+         while (t <= maxDistance)
+         {
+@@ -98,10 +98,10 @@ public class HeightmapTester(JBoundingBox box) : IDynamicTreeProxy, IRayCastable
+             JTriangle tri0 = new JTriangle(a, c, b);
+             JTriangle tri1 = new JTriangle(a, d, c);
+ 
+-            tri0.RayIntersect(origin, direction, JTriangle.CullMode.BackFacing, out JVector normal0, out float lambda0);
+-            tri1.RayIntersect(origin, direction, JTriangle.CullMode.BackFacing, out JVector normal1, out float lambda1);
++            tri0.RayIntersect(origin, direction, JTriangle.CullMode.BackFacing, out JVector normal0, out Real lambda0);
++            tri1.RayIntersect(origin, direction, JTriangle.CullMode.BackFacing, out JVector normal1, out Real lambda1);
+ 
+-            if (lambda0 < float.MaxValue || lambda1 < float.MaxValue)
++            if (lambda0 < Real.MaxValue || lambda1 < Real.MaxValue)
+             {
+                 if (lambda0 <= lambda1)
+                 {
+@@ -133,7 +133,7 @@ public class HeightmapTester(JBoundingBox box) : IDynamicTreeProxy, IRayCastable
+             }
+         }
+ 
+-        normal = JVector.Zero; lambda = 0.0f;
++        normal = JVector.Zero; lambda = 0;
+         return false;
+     }
+ }
+diff --git a/src/JitterDemo/Demos/Misc/Octree.cs b/src/JitterDemo/Demos/Misc/Octree.cs
+index 6dca70ac..41f71c68 100644
+--- a/src/JitterDemo/Demos/Misc/Octree.cs
++++ b/src/JitterDemo/Demos/Misc/Octree.cs
+@@ -163,15 +163,15 @@ public class Octree
+         }
+     }
+ 
+-    public bool Raycast(in JVector origin, in JVector direction, out JVector normal, out float lambda)
++    public bool Raycast(in JVector origin, in JVector direction, out JVector normal, out Real lambda)
+     {
+-        lambda = float.MaxValue;
++        lambda = Real.MaxValue;
+         normal = JVector.Zero;
+ 
+         return InternalRaycast(origin, direction, 0, ref normal, ref lambda);
+     }
+ 
+-    private bool InternalRaycast(in JVector origin, in JVector direction, uint nodeIndex, ref JVector normal, ref float lambda)
++    private bool InternalRaycast(in JVector origin, in JVector direction, uint nodeIndex, ref JVector normal, ref Real lambda)
+     {
+         ref var node = ref nodes[nodeIndex];
+ 
+diff --git a/src/JitterDemo/GlobalUsings.cs b/src/JitterDemo/GlobalUsings.cs
+new file mode 100644
+index 00000000..e9d8b90b
+--- /dev/null
++++ b/src/JitterDemo/GlobalUsings.cs
+@@ -0,0 +1,19 @@
++/*
++ * Jitter2 Physics Library
++ * (c) Thorben Linneweber and contributors
++ * SPDX-License-Identifier: MIT
++ */
++
++// Mirrors Jitter2/Precision.cs. The demo is built with the same switch as the engine
++// (dotnet build -c Release -p:DoublePrecision=true), so "Real" always matches the engine.
++#if USE_DOUBLE_PRECISION
++
++global using Real = System.Double;
++global using MathR = System.Math;
++
++#else
++
++global using Real = System.Single;
++global using MathR = System.MathF;
++
++#endif
+diff --git a/src/JitterDemo/JitterDemo.csproj b/src/JitterDemo/JitterDemo.csproj
+index 2cee85ba..0aaf2604 100644
+--- a/src/JitterDemo/JitterDemo.csproj
++++ b/src/JitterDemo/JitterDemo.csproj
+@@ -44,6 +44,12 @@
+       <PackageReference Include="VellumUI" Version="1.1.0" />
+     </ItemGroup>
+ 
++    <!-- Mirror Jitter2: -p:DoublePrecision=true has to reach this project too, otherwise the
++         demos keep using float literals while the engine hands out doubles. -->
++    <PropertyGroup Condition="'$(DoublePrecision)' == 'true'">
++      <DefineConstants>$(DefineConstants);USE_DOUBLE_PRECISION</DefineConstants>
++    </PropertyGroup>
++
+     <PropertyGroup>
+         <OutputType>Exe</OutputType>
+         <TargetFramework>net10.0</TargetFramework>

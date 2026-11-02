@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\build\JitterPhysicsTest.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>JitterPhysicsTest.Cli</RootNamespace>
+    <AssemblyName>JitterPhysicsTest.Cli</AssemblyName>
+    <Description>命令行运行器：跑场景、看统计、比对哈希。</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JitterPhysicsTest.Scenes\JitterPhysicsTest.Scenes.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,109 @@
+diff --git a/src/Jitter2/Collision/DynamicTree/DynamicTree.Balance.cs b/src/Jitter2/Collision/DynamicTree/DynamicTree.Balance.cs
+index ed0b7630..5578d59e 100644
+--- a/src/Jitter2/Collision/DynamicTree/DynamicTree.Balance.cs
++++ b/src/Jitter2/Collision/DynamicTree/DynamicTree.Balance.cs
+@@ -134,13 +134,76 @@ public partial class DynamicTree
+         return RestoreHeightBalanceWithoutIncreasingCost(node);
+     }
+ 
++    /// <summary>
++    /// Upper bound on the rotations a single <see cref="RestoreHeightBalanceWithoutIncreasingCost"/>
++    /// call may apply.
++    /// </summary>
++    /// <remarks>
++    /// Well-formed trees settle far below this limit. The budget exists so that cost-neutral
++    /// rotations cannot trade places indefinitely: leftover imbalance is repaired by the next
++    /// tree update, which is preferable to an unbounded descent.
++    /// </remarks>
++    private const int MaxHeightBalanceRotations = 64;
++
+     private int RestoreHeightBalanceWithoutIncreasingCost(int node)
++    {
++        // A newly inserted leaf may have been paired with an arbitrarily tall subtree.
++        // In that case one rotation balances the new root but leaves the old root skewed.
++        // The demoted node is therefore re-balanced before the new subtree root is checked
++        // again, exactly as the original recursion did.
++        //
++        // That recursion is expressed here as an explicit stack instead of a recursive call:
++        // it had no termination guarantee. Two topologies with the same merged surface both pass
++        // IsAcceptedHeightRotation, so a node and its promoted child can rotate back and forth
++        // forever. In double precision builds this is reachable with ten rigid bodies and one
++        // step, overflowing the stack inside World.Step.
++        Span<int> pending = stackalloc int[MaxHeightBalanceRotations + 1];
++        int top = 0;
++        int subtreeRoot = node;
++        int rotations = 0;
++
++        pending[top++] = node;
++
++        while (top > 0 && rotations < MaxHeightBalanceRotations)
++        {
++            int current = pending[--top];
++
++            if (nodes[current].IsLeaf) continue;
++
++            // Rotations inside this subtree may have changed the children since it was last seen.
++            RefitNode(current);
++
++            if (!TryHeightBalanceRotation(current, out int promoted)) continue;
++
++            rotations++;
++            subtreeRoot = promoted;
++
++            // LIFO: the demoted node is handled before the promoted root.
++            pending[top++] = promoted;
++            pending[top++] = current;
++        }
++
++        return subtreeRoot;
++    }
++
++    /// <summary>
++    /// Applies a single height-restoring rotation to <paramref name="node"/> if its subtree is
++    /// skewed and a rotation exists that does not increase the tree cost.
++    /// </summary>
++    /// <param name="node">The internal node to balance.</param>
++    /// <param name="promotedRoot">The new subtree root, or <paramref name="node"/> when no rotation was applied.</param>
++    /// <returns><see langword="true"/> when a rotation was applied.</returns>
++    private bool TryHeightBalanceRotation(int node, out int promotedRoot)
+     {
+         int left = nodes[node].Left;
+         int right = nodes[node].Right;
+         int balance = nodes[right].Height - nodes[left].Height;
+ 
+-        if (balance is >= -1 and <= 1) return node;
++        if (balance is >= -1 and <= 1)
++        {
++            promotedRoot = node;
++            return false;
++        }
+ 
+         int promoted = balance > 1 ? right : left;
+         Debug.Assert(!nodes[promoted].IsLeaf);
+@@ -153,19 +216,17 @@ public partial class DynamicTree
+         bool firstAccepted = IsAcceptedHeightRotation(first);
+         bool secondAccepted = IsAcceptedHeightRotation(second);
+ 
+-        if (!firstAccepted && !secondAccepted) return node;
++        if (!firstAccepted && !secondAccepted)
++        {
++            promotedRoot = node;
++            return false;
++        }
+ 
+         RotationCandidate selected = !firstAccepted ? second :
+             !secondAccepted ? first : SelectBalancingRotation(first, second);
+-        int subtreeRoot = ApplyRotation(node, selected);
+ 
+-        // A newly inserted leaf may have been paired with an arbitrarily tall subtree.
+-        // In that case one rotation balances the new root but leaves the old root skewed.
+-        // Continue inside that child before checking the new root again. Either operation may
+-        // leave height imbalance in place when every applicable rotation would increase cost.
+-        RestoreHeightBalanceWithoutIncreasingCost(node);
+-        RefitNode(subtreeRoot);
+-        return RestoreHeightBalanceWithoutIncreasingCost(subtreeRoot);
++        promotedRoot = ApplyRotation(node, selected);
++        return true;
+     }
+ 
+     private RotationCandidate CreateRotationCandidate(int node, int promoted, int moved)

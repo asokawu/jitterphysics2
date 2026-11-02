@@ -1,0 +1,22 @@
+# ── 构建产物 ────────────────────────────────────────────────
+bin/
+obj/
+artifacts/
+publish/
+*.dll
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+
+# ── IDE / 工具 ──────────────────────────────────────────────
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+# ── 其他 ────────────────────────────────────────────────────
+*.log
+*.tmp
+TestResults/

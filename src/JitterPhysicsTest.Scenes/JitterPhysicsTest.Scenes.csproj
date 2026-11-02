@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\build\JitterPhysicsTest.props" />
+
+  <PropertyGroup>
+    <RootNamespace>JitterPhysicsTest.Scenes</RootNamespace>
+    <AssemblyName>JitterPhysicsTest.Scenes</AssemblyName>
+    <Description>Jitter Physics 2（双精度）的场景库与运行器：测试、命令行、性能测试共用。</Description>
+  </PropertyGroup>
+
+</Project>
